@@ -1,8 +1,14 @@
 /*
- * This file creates the server that powers the app. It also handles the database.
+ * This file creates the server that powers the app. It also manages the database.
  * Author: Justin Nichols
  * Class: CSC337
  */
+
+ /*
+    TODO:
+      Look into create vs save.
+      Handle duplicate item-postings.
+  */
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -26,10 +32,10 @@ var Schema = mongoose.Schema;
 // Items
 var ItemSchema = new Schema({
   title: String,
-  description: String,
+  desc: String,
   image: String,
   price: Number,
-  stat: String 
+  avail: String 
   });
 var Item = mongoose.model('Item', ItemSchema);
 
@@ -50,7 +56,50 @@ app
   .get('/get/purchases/:username', (req, res) => console.log("asdf"))
   .get('/search/users/:keyword', (req, res) => console.log("asdf"))
   .get('/search/items/:keyword', (req, res) => console.log("asdf"))
-  .post('/add/user', (req, res) => console.log("asdf"))
-  .post('/add/item/:username', (req, res) => console.log("asdf"))
+  .post('/add/user', (req, res) => addUser(req)) 
+  .post('/add/item/:username', (req, res) => addItem(req))
   .all('*', (req, res) => res.redirect('/'))
   .listen(port, () => console.log('App listening.'))
+
+/*
+ * This function adds a user account to the database.
+ * @param: req. The http request containing the account info.
+ */
+function addUser(req) {  
+  let userObj = req.body;
+  User.find({ username: userObj.username })
+  .exec((error, results) => {
+    if (results.length == 0) {
+      user = new User({ username: userObj.username, password: userObj.password });
+      user.save((err) => { if (err) { console.log('Could not save user.') }});
+      console.log("Account created.");
+    } else {
+      console.log('Username already exists.');  
+    }     
+  });
+}
+
+/*
+ * This function adds an item to the database.
+ * @param: req. The http request containing the account info.
+ */
+function addItem(req) { 
+  let itemObj = req.body;
+  User.find({ username: req.params.username })
+    .exec((error, results) => {
+      if (results.length == 1) {
+        item = new Item({ 
+          title: itemObj.title,
+          desc: itemObj.desc,
+          image: itemObj.image,
+          price: itemObj.price,
+          avail: itemObj.avail 
+        });
+        item.save((err) => { if (err) { console.log('Could not save item.') }});
+        results[0].purchases.push(item._id);
+        console.log('Item added.'); 
+      } else {
+        console.log('Could not find seller.');
+      }
+    });
+}
