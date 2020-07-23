@@ -5,6 +5,9 @@
  * Class: CSC337
  */
 
+/*
+ * Adds a user to the databse.
+ */
 function addUser() {
   $.ajax({
     url: '/add/user',
@@ -16,9 +19,13 @@ function addUser() {
   });
 }
 
+/*
+ * Adds an item to the database.
+ */
 function addItem() {
+  let seller = $('#seller').val();
   $.ajax({
-    url: `add/item/${$('#username').val()}`,
+    url: `add/item/${seller}`,
     method: 'POST',
     data: {  
       title: $('#title').val(),  

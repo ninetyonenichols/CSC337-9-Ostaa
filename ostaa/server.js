@@ -98,7 +98,7 @@ function showUserData(req, res) {
  */
 function showKeywordUsers(req, res) {
   res.setHeader('Content-Type', 'text/plain');
-  let keyword = new RegExp(req.params.keyword);
+  let keyword = new RegExp(decodeURIComponent(req.params.keyword));
   User.find({ username: keyword })
     .exec((error, results) => res.send(JSON.stringify(results, null, 4)));
 }
@@ -108,7 +108,7 @@ function showKeywordUsers(req, res) {
  */
 function showKeywordItems(req, res) {
   res.setHeader('Content-Type', 'text/plain');
-  let keyword = new RegExp(req.params.keyword);
+  let keyword = new RegExp(decodeURIComponent(req.params.keyword));
   Item.find({ desc: keyword })
     .exec((error, results) => res.send(JSON.stringify(results, null, 4)));
 }
